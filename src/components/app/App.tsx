@@ -12,7 +12,8 @@ function App() {
 
   return (
     <div className="container">
-      {addActive ? (
+      <Drop />
+      {/* {addActive ? (
         <div className="firstPage">
           <button onClick={handleClick} className="btn">
             Додати
@@ -20,13 +21,8 @@ function App() {
           <p>Нема жодного сертифікату</p>
         </div>
       ) : (
-        <div className="addPage">
-          <button className="btn" onClick={handleClick}>
-            Назад
-          </button>
-          <Drop />
-        </div>
-      )}
+        <Drop />
+      )} */}
     </div>
   );
 }

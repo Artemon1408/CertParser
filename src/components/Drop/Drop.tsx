@@ -5,11 +5,12 @@ import { fromBER } from "asn1js";
 import "./drop.css";
 import DropItem from "../dropItem/DropItem";
 import CertArea from "../certArea/CertArea";
+import CertList from "../certLIst/CertList";
 
 const Drop = () => {
   const [drag, setDrag] = useState(false);
 
-  const [certificateInfo, setCertificateInfo] = useState<any>(false);
+  const [certificateInfo, setCertificateInfo] = useState<any>(null);
 
   useEffect(() => {
     const savedSubject = localStorage.getItem("subject") ?? "";
@@ -57,10 +58,10 @@ const Drop = () => {
       localStorage.setItem("validTo", validToDate.toISOString());
 
       setCertificateInfo({
-        subject: savedSubject.split(","),
-        issuer: savedIssuer.split(","),
-        validFrom: new Date(savedValidFrom),
-        validTo: new Date(savedValidTo),
+        subject: subject,
+        issuer: issuer,
+        validFrom: validFromDate,
+        validTo: validToDate,
       });
     };
   }
@@ -97,20 +98,35 @@ const Drop = () => {
   const savedValidFrom = localStorage.getItem("validFrom") ?? "";
   const savedValidTo = localStorage.getItem("validTo") ?? "";
 
+  console.log(certificateInfo);
+
   return (
     <>
       {certificateInfo ? (
-        <div className="droppage">
-          <DropItem subject={savedSubject} />
-          <CertArea
-            subject={savedSubject}
-            issuer={savedIssuer}
-            validFrom={savedValidFrom}
-            validTo={savedValidTo}
+        <div>
+          <label htmlFor=" drop-btn-active" className="btn">
+            Додати
+          </label>
+          <input
+            type="file"
+            id="drop-btn-active"
+            className="drop-button"
+            onChange={(e) => onChangeHandler(e)}
           />
+          <div className="droppage">
+            {/* <CertList subject={certificateInfo} /> */}
+            <DropItem subject={savedSubject} />
+            <CertArea
+              subject={savedSubject}
+              issuer={savedIssuer}
+              validFrom={savedValidFrom}
+              validTo={savedValidTo}
+            />
+          </div>
         </div>
       ) : (
         <div className="drop">
+          <button className="btn">Назад</button>
           <form
             className={drag ? "drop-active" : ""}
             onDragStart={(e) => dragStartHandler(e)}
@@ -127,6 +143,7 @@ const Drop = () => {
             <input
               type="file"
               id="drop-btn"
+              className="drop-button"
               onChange={(e) => onChangeHandler(e)}
             />
           </form>

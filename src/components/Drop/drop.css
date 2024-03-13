@@ -20,9 +20,9 @@
   justify-content: center;
 }
 
-#drop-btn {
+/* .drop-button {
   display: none;
-}
+} */
 
 .drop-active {
   background: rgb(240, 240, 240);
@@ -39,4 +39,16 @@ form {
 .droppage {
   display: flex;
   align-items: flex-start;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 32px;
+  transition: opacity 0.3s;
+  border-radius: 3px 3px 3px 3px;
+  border: 1px solid #000;
+  background: rgb(240, 240, 240);
 }

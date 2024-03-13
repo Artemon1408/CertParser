@@ -11,3 +11,7 @@
 .cert-area p {
   font-weight: bold;
 }
+
+.cert-area p span {
+  font-weight: normal;
+}

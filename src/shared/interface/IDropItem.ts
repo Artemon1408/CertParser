@@ -1,6 +1,6 @@
 export interface IDropItem {
-  subject?: string[];
-  issuer?: string[];
-  validFrom?: Date;
-  validTo?: Date;
+  subject?: string[] | string;
+  issuer?: string[] | string;
+  validFrom?: string;
+  validTo?: string;
 }

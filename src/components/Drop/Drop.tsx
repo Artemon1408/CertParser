@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, DragEvent } from "react";
+import { useState, useEffect, ChangeEvent, DragEvent } from "react";
 
 import { Certificate } from "pkijs";
 import { fromBER } from "asn1js";
@@ -8,10 +8,62 @@ import CertArea from "../certArea/CertArea";
 
 const Drop = () => {
   const [drag, setDrag] = useState(false);
-  const [fileContext, setFileContext] = useState<File>();
-  const [certificateInfo, setCertificateInfo] = useState<any>(null);
 
-  function Parser(state?: File) {}
+  const [certificateInfo, setCertificateInfo] = useState<any>(false);
+
+  useEffect(() => {
+    const savedSubject = localStorage.getItem("subject") ?? "";
+    const savedIssuer = localStorage.getItem("issuer") ?? "";
+    const savedValidFrom = localStorage.getItem("validFrom") ?? "";
+    const savedValidTo = localStorage.getItem("validTo") ?? "";
+
+    if (savedSubject && savedIssuer && savedValidFrom && savedValidTo) {
+      setCertificateInfo({
+        subject: savedSubject.split(","),
+        issuer: savedIssuer.split(","),
+        validFrom: new Date(savedValidFrom),
+        validTo: new Date(savedValidTo),
+      });
+    }
+  }, []);
+
+  function Parser(state: File) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      parseCertificate(reader.result as ArrayBuffer);
+    };
+    reader.readAsArrayBuffer(state);
+    const parseCertificate = (fileContent: ArrayBuffer) => {
+      const asn1 = fromBER(fileContent);
+      const certificate = new Certificate({ schema: asn1.result });
+
+      const subject = certificate.subject.typesAndValues.map(
+        (item) => item.value.valueBlock.value
+      );
+      const issuer = certificate.issuer.typesAndValues.map(
+        (item) => item.value.valueBlock.value
+      );
+      const validFrom = certificate.notBefore.value;
+      const validTo = certificate.notAfter.value;
+
+      const subjectString = subject.join(",");
+      const issuerString = issuer.join(",");
+      const validFromDate = new Date(validFrom);
+      const validToDate = new Date(validTo);
+
+      localStorage.setItem("subject", subjectString);
+      localStorage.setItem("issuer", issuerString);
+      localStorage.setItem("validFrom", validFromDate.toISOString());
+      localStorage.setItem("validTo", validToDate.toISOString());
+
+      setCertificateInfo({
+        subject: savedSubject.split(","),
+        issuer: savedIssuer.split(","),
+        validFrom: new Date(savedValidFrom),
+        validTo: new Date(savedValidTo),
+      });
+    };
+  }
 
   function dragStartHandler(e: DragEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,54 +78,35 @@ const Drop = () => {
   function onDropHandler(e: DragEvent<HTMLFormElement>) {
     e.preventDefault();
     let file = e.dataTransfer.files[0];
-    setFileContext(file);
+
     setDrag(false);
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      parseCertificate(reader.result as ArrayBuffer);
-    };
-    reader.readAsArrayBuffer(file);
-    const parseCertificate = (fileContent: ArrayBuffer) => {
-      const asn1 = fromBER(fileContent);
-      const certificate = new Certificate({ schema: asn1.result });
-
-      const subject = certificate.subject.typesAndValues.map(
-        (item) => item.value.valueBlock.value
-      );
-      const issuer = certificate.issuer.typesAndValues.map(
-        (item) => item.value.valueBlock.value
-      );
-      const validFrom = certificate.notBefore.value;
-      const validTo = certificate.notAfter.value;
-
-      setCertificateInfo({
-        subject,
-        issuer,
-        validFrom,
-        validTo,
-      });
-      console.log(validTo.getUTCFullYear());
-    };
+    Parser(file);
   }
 
   function onChangeHandler(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files) {
-      let fileList = Array.from(e.target.files);
+      let fileList = Array.from(e.target.files)[0];
+      Parser(fileList);
     }
   }
-  const { subject, issuer, validFrom, validTo } = certificateInfo || {};
+
+  const savedSubject = localStorage.getItem("subject") ?? "";
+  const savedIssuer = localStorage.getItem("issuer") ?? "";
+  const savedValidFrom = localStorage.getItem("validFrom") ?? "";
+  const savedValidTo = localStorage.getItem("validTo") ?? "";
+
   return (
     <>
       {certificateInfo ? (
         <div className="droppage">
-          <DropItem subject={certificateInfo.subject[0]} />
+          <DropItem subject={savedSubject} />
           <CertArea
-            subject={subject[0]}
-            issuer={issuer[0]}
-            validFrom={validFrom}
-            validTo={validTo}
+            subject={savedSubject}
+            issuer={savedIssuer}
+            validFrom={savedValidFrom}
+            validTo={savedValidTo}
           />
         </div>
       ) : (

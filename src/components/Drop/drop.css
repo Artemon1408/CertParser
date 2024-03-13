@@ -1,0 +1,42 @@
+.drop {
+  margin-left: 200px;
+  width: 400px;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed #000;
+  text-align: center;
+}
+
+.btn-dnd {
+  display: flex;
+  width: 265px;
+  height: 32px;
+  border: 1px solid #000;
+  border-radius: 3px 3px 3px 3px;
+  background: rgb(240, 240, 240);
+  align-items: center;
+  justify-content: center;
+}
+
+#drop-btn {
+  display: none;
+}
+
+.drop-active {
+  background: rgb(240, 240, 240);
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+.droppage {
+  display: flex;
+  align-items: flex-start;
+}

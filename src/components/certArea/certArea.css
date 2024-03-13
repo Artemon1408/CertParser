@@ -1,0 +1,13 @@
+.cert-area {
+  margin-left: 200px;
+  width: 400px;
+  min-height: 400px;
+  background: #fff;
+  border: 1px solid #000;
+  text-align: left;
+  padding: 20px;
+}
+
+.cert-area p {
+  font-weight: bold;
+}

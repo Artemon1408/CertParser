@@ -1,0 +1,12 @@
+.drop-item {
+  margin-top: 40px;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 290px;
+  height: 50px;
+  background: rgb(240, 240, 240);
+  border-radius: 3px 3px 3px 3px;
+  border: 1px solid #000;
+}

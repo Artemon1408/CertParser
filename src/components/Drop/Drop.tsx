@@ -9,11 +9,14 @@ import CertList from "../certLIst/CertList";
 
 const Drop = () => {
   const [drag, setDrag] = useState(false);
-
+  // const [savedSubject, setSavedSubject] = useState<string[]>([]);
   const [certificateInfo, setCertificateInfo] = useState<any>(null);
+  console.log(certificateInfo);
 
   useEffect(() => {
     const savedSubject = localStorage.getItem("subject") ?? "";
+    // const subjects = savedSubjectString.split(",").map((item) => item.trim());
+    // setSavedSubject(subjects);
     const savedIssuer = localStorage.getItem("issuer") ?? "";
     const savedValidFrom = localStorage.getItem("validFrom") ?? "";
     const savedValidTo = localStorage.getItem("validTo") ?? "";
@@ -57,11 +60,15 @@ const Drop = () => {
       localStorage.setItem("validFrom", validFromDate.toISOString());
       localStorage.setItem("validTo", validToDate.toISOString());
 
+      // const newSubject = [...savedSubject, subjectString];
+      // setSavedSubject(newSubject);
+      // localStorage.setItem("subject", newSubject.join(","));
+
       setCertificateInfo({
-        subject: subject,
-        issuer: issuer,
-        validFrom: validFromDate,
-        validTo: validToDate,
+        subject,
+        issuer,
+        validFrom,
+        validTo,
       });
     };
   }
@@ -93,13 +100,6 @@ const Drop = () => {
     }
   }
 
-  const savedSubject = localStorage.getItem("subject") ?? "";
-  const savedIssuer = localStorage.getItem("issuer") ?? "";
-  const savedValidFrom = localStorage.getItem("validFrom") ?? "";
-  const savedValidTo = localStorage.getItem("validTo") ?? "";
-
-  console.log(certificateInfo);
-
   return (
     <>
       {certificateInfo ? (
@@ -114,13 +114,13 @@ const Drop = () => {
             onChange={(e) => onChangeHandler(e)}
           />
           <div className="droppage">
-            {/* <CertList subject={certificateInfo} /> */}
-            <DropItem subject={savedSubject} />
+            <CertList subjects={certificateInfo} />
+
             <CertArea
-              subject={savedSubject}
-              issuer={savedIssuer}
-              validFrom={savedValidFrom}
-              validTo={savedValidTo}
+              subject={certificateInfo.subject.join(",")}
+              issuer={certificateInfo.issuer.join(",")}
+              validFrom={certificateInfo.validFrom.toISOString()}
+              validTo={certificateInfo.validTo.toISOString()}
             />
           </div>
         </div>

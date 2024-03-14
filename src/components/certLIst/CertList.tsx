@@ -1,20 +1,38 @@
+import { useState } from "react";
+import { IDropItem } from "../../shared/interface/IDropItem";
 import DropItem from "../dropItem/DropItem";
+import CertArea from "../certArea/CertArea";
+import "./certList.css";
 const CertList = ({ subjects }: any) => {
-  if (!subjects || !subjects.subject) {
-    return null;
-  }
-  const { subject } = subjects;
+  const [selectedItem, setSelectedItem] = useState(0);
 
-  const resultArr = [subject.join("")];
+  const handleTabClick = (i: number) => {
+    setSelectedItem(i);
+  };
 
-  console.log(subject);
+  const elements = subjects.map((item: IDropItem, i: number) => {
+    const { subject } = item;
+
+    return (
+      <DropItem
+        key={i}
+        subject={subject}
+        onClick={() => handleTabClick(i)}
+        active={i === selectedItem}
+      />
+    );
+  });
 
   return (
-    <>
-      {resultArr.map((subject: any, index: number) => (
-        <DropItem key={index} subject={subject} />
-      ))}
-    </>
+    <div className="cert-field">
+      <div>{elements}</div>
+      <CertArea
+        subject={subjects[selectedItem].subject}
+        issuer={subjects[selectedItem].issuer}
+        validFrom={subjects[selectedItem].validFrom}
+        validTo={subjects[selectedItem].validTo}
+      />
+    </div>
   );
 };
 

@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Drop from "../Drop/Drop";
 
 import "./App.css";
 
 function App() {
   const [addActive, setAddActive] = useState(true);
+  const [addBtn, setAddBtn] = useState(true);
+
+  useEffect(() => {
+    const data = localStorage.getItem("certificates");
+    if (data) {
+      setAddBtn(false);
+      setAddActive(false);
+    }
+  }, []);
 
   const handleClick = () => {
     setAddActive(!addActive);
@@ -12,17 +21,28 @@ function App() {
 
   return (
     <div className="container">
-      <Drop />
-      {/* {addActive ? (
+      {addActive ? (
         <div className="firstPage">
-          <button onClick={handleClick} className="btn">
+          <button className="btn" onClick={handleClick}>
             Додати
           </button>
+
           <p>Нема жодного сертифікату</p>
         </div>
       ) : (
-        <Drop />
-      )} */}
+        <>
+          {addBtn ? (
+            <>
+              <button className="btn" onClick={handleClick}>
+                Назад
+              </button>
+              <Drop />
+            </>
+          ) : (
+            <Drop />
+          )}
+        </>
+      )}
     </div>
   );
 }

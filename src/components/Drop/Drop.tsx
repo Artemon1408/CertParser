@@ -3,41 +3,25 @@ import { useState, useEffect, ChangeEvent, DragEvent } from "react";
 import { Certificate } from "pkijs";
 import { fromBER } from "asn1js";
 import "./drop.css";
-import DropItem from "../dropItem/DropItem";
-import CertArea from "../certArea/CertArea";
+
 import CertList from "../certLIst/CertList";
 
 const Drop = () => {
   const [drag, setDrag] = useState(false);
-  // const [savedSubject, setSavedSubject] = useState<string[]>([]);
+
   const [certificateInfo, setCertificateInfo] = useState<any>(null);
-  console.log(certificateInfo);
 
   useEffect(() => {
-    const savedSubject = localStorage.getItem("subject") ?? "";
-    // const subjects = savedSubjectString.split(",").map((item) => item.trim());
-    // setSavedSubject(subjects);
-    const savedIssuer = localStorage.getItem("issuer") ?? "";
-    const savedValidFrom = localStorage.getItem("validFrom") ?? "";
-    const savedValidTo = localStorage.getItem("validTo") ?? "";
-
-    if (savedSubject && savedIssuer && savedValidFrom && savedValidTo) {
-      setCertificateInfo({
-        subject: savedSubject.split(","),
-        issuer: savedIssuer.split(","),
-        validFrom: new Date(savedValidFrom),
-        validTo: new Date(savedValidTo),
-      });
-    }
+    const savedCertificates = JSON.parse(
+      localStorage.getItem("certificates") || "[]"
+    );
+    setCertificateInfo(savedCertificates);
   }, []);
 
-  function Parser(state: File) {
+  function Parser(file: File) {
     const reader = new FileReader();
     reader.onload = () => {
-      parseCertificate(reader.result as ArrayBuffer);
-    };
-    reader.readAsArrayBuffer(state);
-    const parseCertificate = (fileContent: ArrayBuffer) => {
+      const fileContent = reader.result as ArrayBuffer;
       const asn1 = fromBER(fileContent);
       const certificate = new Certificate({ schema: asn1.result });
 
@@ -50,27 +34,18 @@ const Drop = () => {
       const validFrom = certificate.notBefore.value;
       const validTo = certificate.notAfter.value;
 
-      const subjectString = subject.join(",");
-      const issuerString = issuer.join(",");
-      const validFromDate = new Date(validFrom);
-      const validToDate = new Date(validTo);
+      const newCertificate = {
+        subject: subject.join(","),
+        issuer: issuer.join(","),
+        validFrom: new Date(validFrom).toISOString(),
+        validTo: new Date(validTo).toISOString(),
+      };
 
-      localStorage.setItem("subject", subjectString);
-      localStorage.setItem("issuer", issuerString);
-      localStorage.setItem("validFrom", validFromDate.toISOString());
-      localStorage.setItem("validTo", validToDate.toISOString());
-
-      // const newSubject = [...savedSubject, subjectString];
-      // setSavedSubject(newSubject);
-      // localStorage.setItem("subject", newSubject.join(","));
-
-      setCertificateInfo({
-        subject,
-        issuer,
-        validFrom,
-        validTo,
-      });
+      const updatedCertificates = [...certificateInfo, newCertificate];
+      setCertificateInfo(updatedCertificates);
+      localStorage.setItem("certificates", JSON.stringify(updatedCertificates));
     };
+    reader.readAsArrayBuffer(file);
   }
 
   function dragStartHandler(e: DragEvent<HTMLFormElement>) {
@@ -94,17 +69,19 @@ const Drop = () => {
   }
 
   function onChangeHandler(e: ChangeEvent<HTMLInputElement>) {
+    e.preventDefault();
     if (e.target.files) {
       let fileList = Array.from(e.target.files)[0];
+
       Parser(fileList);
     }
   }
 
   return (
     <>
-      {certificateInfo ? (
+      {certificateInfo !== null && certificateInfo.length !== 0 ? (
         <div>
-          <label htmlFor=" drop-btn-active" className="btn">
+          <label htmlFor="drop-btn-active" className="btn-drop">
             Додати
           </label>
           <input
@@ -114,19 +91,13 @@ const Drop = () => {
             onChange={(e) => onChangeHandler(e)}
           />
           <div className="droppage">
-            <CertList subjects={certificateInfo} />
-
-            <CertArea
-              subject={certificateInfo.subject.join(",")}
-              issuer={certificateInfo.issuer.join(",")}
-              validFrom={certificateInfo.validFrom.toISOString()}
-              validTo={certificateInfo.validTo.toISOString()}
-            />
+            <div className="drop-list">
+              <CertList subjects={certificateInfo} />
+            </div>
           </div>
         </div>
       ) : (
         <div className="drop">
-          <button className="btn">Назад</button>
           <form
             className={drag ? "drop-active" : ""}
             onDragStart={(e) => dragStartHandler(e)}

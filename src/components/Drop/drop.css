@@ -20,9 +20,22 @@
   justify-content: center;
 }
 
-/* .drop-button {
+.drop-button {
   display: none;
-} */
+}
+
+.btn-drop {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 32px;
+  transition: opacity 0.3s;
+  border-radius: 3px 3px 3px 3px;
+  border: 1px solid #000;
+  background: rgb(240, 240, 240);
+}
 
 .drop-active {
   background: rgb(240, 240, 240);
@@ -41,14 +54,7 @@ form {
   align-items: flex-start;
 }
 
-.btn {
+.drop-list {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 120px;
-  height: 32px;
-  transition: opacity 0.3s;
-  border-radius: 3px 3px 3px 3px;
-  border: 1px solid #000;
-  background: rgb(240, 240, 240);
+  flex-direction: column;
 }
